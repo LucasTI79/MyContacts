@@ -29,10 +29,9 @@ class ContactsRepository {
     return row;
   }
 
-  findByEmail(email) {
-    return new Promise((resolve) => resolve(
-      contacts.find((contact) => contact.email === email),
-    ));
+  async findByEmail(email) {
+    const [row] = await db.query('SELECT * FROM contacts where id = $1', [email]);
+    return row;
   }
 
   delete(id) {
