@@ -1,32 +1,23 @@
-const { v4 } = require('uuid');
 const db = require('../../database');
-
-const contacts = [
-  {
-    id: v4(),
-    name: 'Lucas',
-    email: 'lucas@mail.com',
-    phone: '151681651',
-    category_id: v4(),
-  },
-  {
-    id: v4(),
-    name: 'Mateus',
-    email: 'mateus@mail.com',
-    phone: '561986',
-    category_id: v4(),
-  },
-];
 
 class ContactsRepository {
   async findAll(orderBy = 'ASC') {
     const direction = orderBy.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
-    const rows = await db.query(`SELECT * FROM contacts ORDER BY name ${direction}`);
+    const rows = await db.query(`
+      SELECT contacts.*, categories.name AS category_name
+      FROM contacts
+      LEFT JOIN categories ON categories.id = contacts.category_id
+      ORDER BY contacts.name ${direction}`);
     return rows;
   }
 
   async findById(id) {
-    const [row] = await db.query('SELECT * FROM contacts where id = $1', [id]);
+    const [row] = await db.query(`
+      SELECT contacts.*, categories.name AS category_name
+      FROM contacts
+      LEFT JOIN categories ON categories.id = contacts.category_id
+      where contacts.id = $1
+    `, [id]);
     return row;
   }
 
